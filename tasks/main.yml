@@ -1,0 +1,9 @@
+#
+# Main tasks:
+#   - Install php & denpendencies base on OS
+#
+
+---
+- import_tasks: centos/main.yml
+  when: 
+    - ansible_distribution == 'CentOS'

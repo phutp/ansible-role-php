@@ -1,0 +1,60 @@
+#
+# Install php & dependencies for CentOS
+#
+
+---
+- name: install required packages 
+  yum:
+    name:
+      - libselinux-python
+      - epel-release
+
+- name: install the remi repo
+  yum:
+    name:
+      - "http://rpms.remirepo.net/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
+  when: "'7' in php_version"
+
+- name: install php version 7
+  yum:
+    name: "{{ php_pkgs }}"
+    enablerepo: remi-{{ php_version }}
+    state: present
+    update_cache: yes
+  when: "'7' in php_version"
+
+- name: install php version 5
+  yum:
+    name: "{{ php_pkgs }}"
+    state: present
+    update_cache: yes
+  when: "'5' in php_version"  
+
+- name: grant permission for php directory
+  file:
+    path: "/var/lib/php"
+    owner: root
+    group: nginx
+    recurse: "yes"
+
+- name: stat php-fpm config
+  stat:
+    path: "/etc/php-fpm.d/www.conf.default"
+  register: stat_php_fpm_config
+
+- name: backup php-fpm default config 
+  copy:
+    src: /etc/php-fpm.d/www.conf
+    dest: /etc/php-fpm.d/www.conf.default
+    remote_src: "yes"
+  when: not stat_php_fpm_config.stat.exists
+
+- name: generate configs for php-fpm
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - { src: "www.conf.j2", dest: "/etc/php-fpm.d/{{ php_fpm_pool_name }}.conf" }
+  notify:
+    - restart php-fpm service
+    - restart nginx service

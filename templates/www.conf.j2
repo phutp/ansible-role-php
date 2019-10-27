@@ -1,0 +1,26 @@
+[{{ php_fpm_pool_name }}]
+
+user = {{ php_fpm_user }}
+group = {{ php_fpm_group }}
+
+listen = {{ php_fpm_listen }}
+listen.owner = {{ php_fpm_listen_owner }}
+listen.group = {{ php_fpm_listen_group }}
+listen.allowed_clients = {{ php_fpm_listen_allowed_clients }}
+
+pm = {{ pm_mode }}
+pm.max_children = {{ pm_max_children }}
+pm.max_requests = {{ pm_max_requests }}
+pm.process_idle_timeout = {{ pm_process_idle_timeout }}
+pm.status_path = /fpm-status
+
+slowlog = /var/log/php-fpm/www-slow.log
+request_slowlog_timeout = {{ pm_request_slowlog_timeout }} 
+
+php_admin_value[error_log] = /var/log/php-fpm/www-error.log
+php_admin_flag[log_errors] = on
+;php_admin_value[memory_limit] = 128M
+
+php_value[session.save_handler] = files
+php_value[session.save_path]    = /var/lib/php/session
+php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache

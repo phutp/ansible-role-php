@@ -1,0 +1,14 @@
+---
+- name: restart nginx service
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: restart php-fpm service
+  systemd:
+    name: php-fpm
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
